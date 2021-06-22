@@ -1,0 +1,168 @@
+List of APIs implemented(8 nos):
+
+1) Link: http://0.0.0.0:5000/registeruser
+   API Purpose: Register Agent/Admin
+   Route: "/registeruser"
+   Method-type: POST 
+   Content-Type: application/json
+   Parmas: {user_fname, user_lname, user_email, user_password, user_role, user_phone}
+   
+   NOTE:
+   1) If we need to make one user add manually into the system then pass "is_activated = 1" else no need.
+   2) Validation check for email and phone number are made
+   3) user_role: 0-> AGENT & 1-> ADMIN
+   4) Need unique user_phone & user_email
+
+   Sample Input:
+    1) ADMIN (Initially approved Admin in the system "is_activated=1"):
+       {
+        "user_fname":"chahat",
+        "user_lname":"Agarwal",
+        "user_email":"chahatagarwal@ymail.com",
+        "user_password":"hello_world",
+        "user_phone": 7200828674,
+        "user_role": true,
+        "is_activated": true
+        }
+    2) AGENT (Requires Approval) - for delete demo
+        {
+        "user_fname":"rahul",
+        "user_lname":"Agarwal",
+        "user_email":"ragarwal@ymail.com",
+        "user_password":"hello_world",
+        "user_phone": 8825928141,
+        "user_role": false
+        }
+    3) AGENT (Requires Approval) - for Statistics demo
+      {
+        "user_fname":"srikar",
+        "user_lname":"kumar",
+        "user_email":"srikumar@ymail.com",
+        "user_password":"hello_world",
+        "user_phone": 9876543210,
+        "user_role": false
+        } 
+
+2) Link: http://0.0.0.0:5000/userlogin
+   API: LOGIN as Admin/Agent
+   Route: "/userlogin"
+   Method type: POST 
+   Content-Type: application/json
+   Parmas: {user_password, user_phone}
+
+   NOTE:
+   1) Create session for respective user while logging in.
+   2) making sure if the user has access to the portal
+   3) respective task is accessible based on user type.
+
+    Sample Input:
+    1) Initially login using AGENT to check if allowed to access the system
+        {
+        "user_password":"hello_world",
+        "user_phone": 8825928141
+        }
+    2) then login using ADMIN approved credentials
+        {
+        "user_password":"hello_world",
+        "user_phone": 7200828674
+        }
+
+3) Link: http://0.0.0.0:5000/readusers
+   API: Read all users ONLY by ADMIN
+   Route: "/readusers"
+   Method type: GET
+
+   NOTE:
+   1) It list all the users in the system
+
+   Sample Input: It's GET method with NO parameters in URL.
+
+4) Link: http://0.0.0.0:5000/userupdate
+   API: activate/deactivate user using UPDATE by ADMIN ONLY
+   Route: "/userupdate"
+   Method type: PUT
+   Params: {user_phone, action_type}
+
+   NOTE:
+   1) Input type for "action_type" attribute: 
+      1)a) "inactive" -> revoke access of portal for that user
+                        OR
+      1)b) "active" -> provide access to the portal for that user
+
+    Sample Input:
+    1) to make user active and hence providing access to the system (If access already giving then no issues)
+    {
+        "user_phone":8825928141,
+        "action_type": "active"
+    }
+    2) to make user inactive and hence revoking the access from the system
+    {
+        "user_phone": 8825928141,
+        "action_type": "active"
+    }
+    3) For statistical demo provide access to second AGENT "srikar"
+    {
+        "user_phone": 9876543210,
+        "action_type": "active"
+    }
+
+5) Link: http://0.0.0.0:5000/deleteuser
+   API: DELETE inactive user from the system, ONLY by ADMIN
+   Route: "/deleteuser"
+   Method type: DELETE
+   Params: {user_phone}
+
+   NOTE:
+   1) pre-requiste-> user should already be deactivated/revoked from accessing the portal
+
+   Sample Input:
+   1) To delete an is_deleted = 1 USER being a pre-requiste. This action can be done only by ADMIN 
+   {
+      "user_phone": 8825928141
+      }
+
+6) Link: http://0.0.0.0:5000/userlogs
+   API: LOGS retrieval by ADMIN only
+   Route: "/userlogs"
+   Method type: GET
+
+   NOTE:
+   1) It stores Remote IP Address, datetime, attribute changed along with old and new values
+
+   Sample Input: It's GET method with NO parameters in URL.
+
+7) Link: http://0.0.0.0:5000/count/inactive
+   API: Statistics - count for active or inactive users by AGENT ONLY
+   Route: "/count/<count_action_type>"
+   Method type: GET 
+
+   NOTE:
+   1) Input type for "count_action_type": 
+      1)a) "inactive" -> returns count of inactive users present in the system
+                     OR 
+      1)b) "active" -> returns count of active users present in the system
+
+   SAMPLE Input:
+   1) find the active users in the system
+      /count/active
+   2) find inactive users in the system
+      /count/inactive
+
+8) Link: http://0.0.0.0:5000/userlogout
+   API: LOGOUT ADMIN/AGENT
+   Route: "/userlogout"
+   Method type: POST 
+   Content-Type: application/json
+   Parmas: {user_phone}
+
+   Sample Input:
+   1) logout from system and also remove session:
+      {
+      "user_password":"hello_world",
+      "user_phone": 9876543210
+      }
+
+NOTE:
+1) If TESTING THIS APPLICAION FROM SAME LOCAL SYSTEM FOR ADMIN and AGENT, 
+   THEN LOGOUT the CURRENT ACTIVE USER TYPE which helps to try features provided for other USER.
+2) IF changing anything in CODE then LOGIN again since sessions are automatically removed as SERVER is running in DEBUG MODE.
